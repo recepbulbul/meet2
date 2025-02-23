@@ -1,4 +1,11 @@
-const socket = io('/');
+const socket = io('/', {
+    transports: ['websocket', 'polling'],
+    upgrade: true,
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    timeout: 10000
+});
 const videoGrid = document.getElementById('video-grid');
 const myVideo = document.createElement('video');
 myVideo.muted = true;
@@ -102,8 +109,17 @@ peer.on('error', error => {
     }
 });
 
+// Socket bağlantı durumu kontrolü
+socket.on('connect', () => {
+    console.log('Socket.IO bağlantısı başarılı');
+});
+
 socket.on('connect_error', (error) => {
-    console.error('Socket bağlantı hatası:', error);
+    console.error('Socket.IO bağlantı hatası:', error);
+});
+
+socket.on('reconnect_attempt', () => {
+    console.log('Socket.IO yeniden bağlanmaya çalışıyor...');
 });
 
 // Ses kontrolü
