@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Görüşme</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script>
+        const ROOM_ID = "<%= roomId %>";
+    </script>
+</head>
+<body>
+    <div class="room-container">
+        <div class="sidebar">
+            <div class="room-info">
+                <h3>Oda Bilgisi</h3>
+                <div class="room-id-container">
+                    <input type="text" id="roomId" value="<%= roomId %>" readonly>
+                    <button onclick="copyRoomId()" class="icon-button">
+                        <i class="material-icons">content_copy</i>
+                    </button>
+                </div>
+            </div>
+            <div class="participants">
+                <h3>Katılımcılar</h3>
+                <div id="participants-list">
+                    <!-- Katılımcılar dinamik olarak eklenecek -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="video-grid"></div>
+            
+            <div class="controls">
+                <button onclick="toggleMute()" id="muteBtn" class="control-button">
+                    <span class="material-symbols-rounded">mic</span>
+                </button>
+                <button onclick="toggleVideo()" id="videoBtn" class="control-button">
+                    <span class="material-symbols-rounded">videocam</span>
+                </button>
+                <button onclick="leaveRoom()" class="control-button leave">
+                    <span class="material-symbols-rounded">call_end</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="/script.js"></script>
+</body>
+</html> 
