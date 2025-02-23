@@ -1,10 +1,11 @@
 const socket = io('/', {
-    transports: ['websocket', 'polling'],
-    upgrade: true,
+    transports: ['polling'],
     reconnection: true,
-    reconnectionAttempts: 5,
+    reconnectionAttempts: 10,
     reconnectionDelay: 1000,
-    timeout: 10000
+    timeout: 20000,
+    path: '/socket.io/',
+    forceNew: true
 });
 const videoGrid = document.getElementById('video-grid');
 const myVideo = document.createElement('video');
@@ -17,22 +18,21 @@ const peers = {};
 // PeerJS bağlantısı
 const peer = new Peer(undefined, {
     path: '/peerjs',
-    host: '/',
-    port: '443',
-    secure: true,
+    host: location.hostname,
+    port: location.protocol === 'https:' ? 443 : 3000,
+    secure: location.protocol === 'https:',
+    debug: 3,
     config: {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
             {
                 urls: 'turn:numb.viagenie.ca',
                 credential: 'muazkh',
                 username: 'webrtc@live.com'
             }
         ]
-    },
-    debug: 3
+    }
 });
 
 // Bağlantı yeniden deneme mekanizması
@@ -116,6 +116,8 @@ socket.on('connect', () => {
 
 socket.on('connect_error', (error) => {
     console.error('Socket.IO bağlantı hatası:', error);
+    // Polling'e geç
+    socket.io.opts.transports = ['polling'];
 });
 
 socket.on('reconnect_attempt', () => {
