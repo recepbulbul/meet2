@@ -3,13 +3,18 @@ const cors = require('cors');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server, {
+    path: '/socket.io/',
+    serveClient: true,
+    pingTimeout: 60000,
+    pingInterval: 25000,
+    upgradeTimeout: 30000,
+    allowUpgrades: false, // WebSocket yükseltmesini devre dışı bırak
+    transports: ['polling'], // Sadece polling kullan
     cors: {
         origin: "*",
         methods: ["GET", "POST"],
-        transports: ['websocket', 'polling'],
         credentials: true
-    },
-    allowEIO3: true // Engine.IO v3 desteği ekle
+    }
 });
 const { ExpressPeerServer } = require('peer');
 const { v4: uuidV4 } = require('uuid');
@@ -34,6 +39,7 @@ app.use(cors({
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/peerjs', peerServer);
 
@@ -80,11 +86,13 @@ io.on('connection', socket => {
     });
 });
 
-// Error handling
-server.on('error', (error) => {
-    console.error('Server hatası:', error);
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Bir şeyler yanlış gitti!');
 });
 
+// Server başlatma
 server.listen(port, () => {
     console.log(`Server ${port} portunda çalışıyor`);
 });
